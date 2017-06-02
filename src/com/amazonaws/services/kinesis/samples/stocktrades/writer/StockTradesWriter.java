@@ -40,6 +40,7 @@ import com.amazonaws.services.kinesis.samples.stocktrades.utils.CredentialUtils;
 public class StockTradesWriter {
 
     private static final Log LOG = LogFactory.getLog(StockTradesWriter.class);
+    private static boolean table_exist = false;
 
     private static void checkUsage(String[] args) {
         if (args.length != 2) {
