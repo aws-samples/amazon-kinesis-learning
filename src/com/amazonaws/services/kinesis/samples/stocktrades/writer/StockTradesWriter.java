@@ -21,11 +21,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
+import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
 import com.amazonaws.services.kinesis.AmazonKinesis;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.DescribeStreamResult;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.ResourceNotFoundException;
@@ -114,11 +113,13 @@ public class StockTradesWriter {
             System.exit(1);
         }
 
-        AWSCredentials credentials = CredentialUtils.getCredentialsProvider().getCredentials();
-
-        AmazonKinesis kinesisClient = new AmazonKinesisClient(credentials,
-                ConfigurationUtils.getClientConfigWithUserAgent());
-        kinesisClient.setRegion(region);
+        AmazonKinesisClientBuilder clientBuilder = AmazonKinesisClientBuilder.standard();
+        
+        clientBuilder.setRegion(regionName);
+        clientBuilder.setCredentials(CredentialUtils.getCredentialsProvider());
+        clientBuilder.setClientConfiguration(ConfigurationUtils.getClientConfigWithUserAgent());
+        
+        AmazonKinesis kinesisClient = clientBuilder.build();
 
         // Validate that the stream exists and is active
         validateStream(kinesisClient, streamName);
