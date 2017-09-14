@@ -36,7 +36,8 @@ public class ConfigurationUtils {
         userAgent.append("/");
         userAgent.append(VERSION);
 
-        config.setUserAgent(userAgent.toString());
+        config.setUserAgentPrefix(userAgent.toString());
+        config.setUserAgentSuffix(null);
 
         return config;
     }
