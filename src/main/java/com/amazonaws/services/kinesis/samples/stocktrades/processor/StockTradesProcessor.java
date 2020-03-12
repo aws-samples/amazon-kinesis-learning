@@ -22,17 +22,17 @@ import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.RegionUtils;
-import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorFactory;
-import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration;
-import com.amazonaws.services.kinesis.clientlibrary.lib.worker.Worker;
-import com.amazonaws.services.kinesis.samples.stocktrades.utils.ConfigurationUtils;
-import com.amazonaws.services.kinesis.samples.stocktrades.utils.CredentialUtils;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
+import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
+import software.amazon.kinesis.common.ConfigsBuilder;
+import software.amazon.kinesis.common.KinesisClientUtil;
+import software.amazon.kinesis.coordinator.Scheduler;
+import software.amazon.kinesis.processor.ShardRecordProcessor;
 
 /**
- * Uses the Kinesis Client Library (KCL) to continuously consume and process stock trade
+ * Uses the Kinesis Client Library (KCL) 2.2.9 to continuously consume and process stock trade
  * records from the stock trades stream. KCL monitors the number of shards and creates
  * record processor instances to read and process records from each shard. KCL also
  * load balances shards across all the instances of this processor.
@@ -44,7 +44,7 @@ public class StockTradesProcessor {
 
     private static final Logger ROOT_LOGGER = Logger.getLogger("");
     private static final Logger PROCESSOR_LOGGER =
-            Logger.getLogger("com.amazonaws.services.kinesis.samples.stocktrades.processor");
+            Logger.getLogger("com.amazonaws.services.kinesis.samples.stocktrades.processor.StockTradeRecordProcessor");
 
     private static void checkUsage(String[] args) {
         if (args.length != 3) {
@@ -62,38 +62,42 @@ public class StockTradesProcessor {
      */
     private static void setLogLevels() {
         ROOT_LOGGER.setLevel(Level.WARNING);
-        PROCESSOR_LOGGER.setLevel(Level.INFO);
+        // Set this to INFO for logging at INFO level. Suppressed for this example as it can be noisy.
+        PROCESSOR_LOGGER.setLevel(Level.WARNING);
     }
 
     public static void main(String[] args) throws Exception {
         checkUsage(args);
 
+        setLogLevels();
+
         String applicationName = args[0];
         String streamName = args[1];
-        Region region = RegionUtils.getRegion(args[2]);
+        Region region = Region.of(args[2]);
+
         if (region == null) {
             System.err.println(args[2] + " is not a valid AWS region.");
             System.exit(1);
         }
 
-        setLogLevels();
+        KinesisAsyncClient kinesisClient = KinesisClientUtil.createKinesisAsyncClient(KinesisAsyncClient.builder().region(region));
+        DynamoDbAsyncClient dynamoClient = DynamoDbAsyncClient.builder().region(region).build();
+        CloudWatchAsyncClient cloudWatchClient = CloudWatchAsyncClient.builder().region(region).build();
+        StockTradeRecordProcessorFactory shardRecordProcessor = new StockTradeRecordProcessorFactory();
+        ConfigsBuilder configsBuilder = new ConfigsBuilder(streamName, applicationName, kinesisClient, dynamoClient, cloudWatchClient, UUID.randomUUID().toString(), shardRecordProcessor);
 
-        AWSCredentialsProvider credentialsProvider = CredentialUtils.getCredentialsProvider();
-
-        String workerId = String.valueOf(UUID.randomUUID());
-        KinesisClientLibConfiguration kclConfig =
-                new KinesisClientLibConfiguration(applicationName, streamName, credentialsProvider, workerId)
-            .withRegionName(region.getName())
-            .withCommonClientConfig(ConfigurationUtils.getClientConfigWithUserAgent());
-
-        IRecordProcessorFactory recordProcessorFactory = new StockTradeRecordProcessorFactory();
-
-        // Create the KCL worker with the stock trade record processor factory
-        Worker worker = new Worker(recordProcessorFactory, kclConfig);
-
+        Scheduler scheduler = new Scheduler(
+                configsBuilder.checkpointConfig(),
+                configsBuilder.coordinatorConfig(),
+                configsBuilder.leaseManagementConfig(),
+                configsBuilder.lifecycleConfig(),
+                configsBuilder.metricsConfig(),
+                configsBuilder.processorConfig(),
+                configsBuilder.retrievalConfig()
+        );
         int exitCode = 0;
         try {
-            worker.run();
+            scheduler.run();
         } catch (Throwable t) {
             LOG.error("Caught throwable while processing data.", t);
             exitCode = 1;

@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.amazonaws</groupId>
+    <artifactId>amazon-kinesis-learning</artifactId>
+    <packaging>jar</packaging>
+    <name>Amazon Kinesis Tutorial</name>
+    <version>0.0.1</version>
+    <description>Tutorial and examples for aws-kinesis-client
+    </description>
+    <url>https://aws.amazon.com/kinesis</url>
+
+    <scm>
+        <url>https://github.com/awslabs/amazon-kinesis-learning.git</url>
+    </scm>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <licenses>
+        <license>
+            <name>Amazon Software License</name>
+            <url>https://aws.amazon.com/asl</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <aws-kinesis-client.version>2.2.8</aws-kinesis-client.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>software.amazon.kinesis</groupId>
+            <artifactId>amazon-kinesis-client</artifactId>
+            <version>2.2.9</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+        </dependency>
+    </dependencies>
+
+
+
+
+</project>

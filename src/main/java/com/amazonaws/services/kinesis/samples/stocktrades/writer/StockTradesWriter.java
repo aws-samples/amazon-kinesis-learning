@@ -15,23 +15,23 @@
 
 package com.amazonaws.services.kinesis.samples.stocktrades.writer;
 
-import java.nio.ByteBuffer;
+
+import java.util.concurrent.ExecutionException;
+
+
+
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.regions.Region;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.RegionUtils;
-import com.amazonaws.services.kinesis.AmazonKinesis;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
-import com.amazonaws.services.kinesis.model.DescribeStreamResult;
-import com.amazonaws.services.kinesis.model.PutRecordRequest;
-import com.amazonaws.services.kinesis.model.ResourceNotFoundException;
 import com.amazonaws.services.kinesis.samples.stocktrades.model.StockTrade;
-import com.amazonaws.services.kinesis.samples.stocktrades.utils.ConfigurationUtils;
-import com.amazonaws.services.kinesis.samples.stocktrades.utils.CredentialUtils;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
+import software.amazon.awssdk.services.kinesis.model.PutRecordRequest;
+import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
+import software.amazon.kinesis.common.KinesisClientUtil;
 
 /**
  * Continuously sends simulated stock trades to Kinesis
@@ -55,18 +55,15 @@ public class StockTradesWriter {
      * @param kinesisClient Amazon Kinesis client instance
      * @param streamName Name of stream
      */
-    private static void validateStream(AmazonKinesis kinesisClient, String streamName) {
+    private static void validateStream(KinesisAsyncClient kinesisClient, String streamName) {
         try {
-            DescribeStreamResult result = kinesisClient.describeStream(streamName);
-            if(!"ACTIVE".equals(result.getStreamDescription().getStreamStatus())) {
+            DescribeStreamRequest describeStreamRequest =  DescribeStreamRequest.builder().streamName(streamName).build();
+            DescribeStreamResponse describeStreamResponse = kinesisClient.describeStream(describeStreamRequest).get();
+            if(!describeStreamResponse.streamDescription().streamStatus().toString().equals("ACTIVE")) {
                 System.err.println("Stream " + streamName + " is not active. Please wait a few moments and try again.");
                 System.exit(1);
             }
-        } catch (ResourceNotFoundException e) {
-            System.err.println("Stream " + streamName + " does not exist. Please create it in the console.");
-            System.err.println(e);
-            System.exit(1);
-        } catch (Exception e) {
+        }catch (Exception e) {
             System.err.println("Error found while describing the stream " + streamName);
             System.err.println(e);
             System.exit(1);
@@ -80,8 +77,8 @@ public class StockTradesWriter {
      * @param kinesisClient Amazon Kinesis client
      * @param streamName Name of stream
      */
-    private static void sendStockTrade(StockTrade trade, AmazonKinesis kinesisClient,
-            String streamName) {
+    private static void sendStockTrade(StockTrade trade, KinesisAsyncClient kinesisClient,
+                                       String streamName) {
         // TODO: Implement method
     }
 
@@ -90,17 +87,13 @@ public class StockTradesWriter {
 
         String streamName = args[0];
         String regionName = args[1];
-        Region region = RegionUtils.getRegion(regionName);
+        Region region = Region.of(regionName);
         if (region == null) {
             System.err.println(regionName + " is not a valid AWS region.");
             System.exit(1);
         }
 
-        AWSCredentials credentials = CredentialUtils.getCredentialsProvider().getCredentials();
-
-        AmazonKinesis kinesisClient = new AmazonKinesisClient(credentials,
-                ConfigurationUtils.getClientConfigWithUserAgent());
-        kinesisClient.setRegion(region);
+        KinesisAsyncClient kinesisClient = KinesisClientUtil.createKinesisAsyncClient(KinesisAsyncClient.builder().region(region));
 
         // Validate that the stream exists and is active
         validateStream(kinesisClient, streamName);

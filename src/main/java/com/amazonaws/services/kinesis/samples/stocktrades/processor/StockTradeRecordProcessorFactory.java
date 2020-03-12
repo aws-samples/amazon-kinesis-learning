@@ -28,27 +28,17 @@ package com.amazonaws.services.kinesis.samples.stocktrades.processor;/*
  * permissions and limitations under the License.
  */
 
-import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
-import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorFactory;
+
+import software.amazon.kinesis.processor.ShardRecordProcessor;
+import software.amazon.kinesis.processor.ShardRecordProcessorFactory;
 
 /**
  * Used to create new stock trade record processors.
  *
  */
-public class StockTradeRecordProcessorFactory implements IRecordProcessorFactory {
-
-    /**
-     * Constructor.
-     */
-    public StockTradeRecordProcessorFactory() {
-        super();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+public class StockTradeRecordProcessorFactory implements ShardRecordProcessorFactory {
     @Override
-    public IRecordProcessor createProcessor() {
+    public ShardRecordProcessor shardRecordProcessor() {
         return new StockTradeRecordProcessor();
     }
 
