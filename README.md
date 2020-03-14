@@ -1,10 +1,10 @@
 # Learning Amazon Kinesis Development
 
-The master branch provides completed code for the [Learning Kinesis Development][learning-kinesis] series in the [Kinesis Developer Guide][kinesis-developer-guide].
+The master branch provides completed code for the [Process Real-Time Stock Data Using KPL and KCL Tutorial][learning-kinesis]  in the [Kinesis Developer Guide][kinesis-developer-guide].
 
-Each learning module in the series has its own branch (for example, learning-module-1 branch for the first learning module). If you are interested in following the learning plan for this series, it is recommended that you start with the code in the corresponding module branch to stay in sync with each learning module.
+The tutorial uses KCL 2.2.9 to demonstrate how to send a stream of records to Kinesis Data Streams and implement an application that consumes and processes the records in near-real time. 
 
-[learning-kinesis]: http://docs.aws.amazon.com/kinesis/latest/dev/learning-kinesis.html
+[learning-kinesis]:  https://docs.aws.amazon.com/streams/latest/dev/tutorial-stock-data-kplkcl.html
 [kinesis-developer-guide]: http://docs.aws.amazon.com/kinesis/latest/dev/introduction.html
 
 ## License Summary
