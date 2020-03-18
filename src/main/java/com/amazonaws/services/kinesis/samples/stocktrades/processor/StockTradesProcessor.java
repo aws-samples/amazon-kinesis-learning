@@ -29,7 +29,6 @@ import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.kinesis.common.ConfigsBuilder;
 import software.amazon.kinesis.common.KinesisClientUtil;
 import software.amazon.kinesis.coordinator.Scheduler;
-import software.amazon.kinesis.processor.ShardRecordProcessor;
 
 /**
  * Uses the Kinesis Client Library (KCL) 2.2.9 to continuously consume and process stock trade
