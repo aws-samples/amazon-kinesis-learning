@@ -65,7 +65,25 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
 
     @Override
     public void processRecords(ProcessRecordsInput processRecordsInput) {
-        // TODO: Implement method
+         try {
+            log.info("Processing " +processRecordsInput.records().size() + " record(s)");
+            processRecordsInput.records().forEach(r -> processRecord(r));
+            // If it is time to report stats as per the reporting interval, report stats
+            if (System.currentTimeMillis() > nextReportingTimeInMillis) {
+                reportStats();
+                resetStats();
+                nextReportingTimeInMillis = System.currentTimeMillis() + REPORTING_INTERVAL_MILLIS;
+            }
+
+            // Checkpoint once every checkpoint interval
+            if (System.currentTimeMillis() > nextCheckpointTimeInMillis) {
+                checkpoint(processRecordsInput.checkpointer());
+                nextCheckpointTimeInMillis = System.currentTimeMillis() + CHECKPOINT_INTERVAL_MILLIS;
+            }
+        } catch (Throwable t) {
+            log.error("Caught throwable while processing records. Aborting.");
+            Runtime.getRuntime().halt(1);
+        }
 
     }
 
@@ -78,14 +96,7 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
     }
 
     private void processRecord(KinesisClientRecord record) {
-        byte[] arr = new byte[record.data().remaining()];
-        record.data().get(arr);
-        StockTrade trade = StockTrade.fromJsonAsBytes(arr);
-        if (trade == null) {
-            log.warn("Skipping record. Unable to parse record into StockTrade. Partition Key: " + record.partitionKey());
-            return;
-        }
-        stockStats.addStockTrade(trade);
+        // TODO: Implement method
     }
 
     @Override
