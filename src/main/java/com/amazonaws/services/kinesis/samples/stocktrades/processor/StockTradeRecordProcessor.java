@@ -66,7 +66,7 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
     @Override
     public void processRecords(ProcessRecordsInput processRecordsInput) {
          try {
-            log.info("Processing " +processRecordsInput.records().size() + " record(s)");
+            log.info("Processing " + processRecordsInput.records().size() + " record(s)");
             processRecordsInput.records().forEach(r -> processRecord(r));
             // If it is time to report stats as per the reporting interval, report stats
             if (System.currentTimeMillis() > nextReportingTimeInMillis) {
