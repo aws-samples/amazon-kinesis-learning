@@ -36,19 +36,25 @@
     </licenses>
 
     <properties>
-        <aws-kinesis-client.version>2.2.8</aws-kinesis-client.version>
+        <aws-kinesis-client.version>2.4.3</aws-kinesis-client.version>
+        <slf4j.version>2.0.5</slf4j.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>software.amazon.kinesis</groupId>
             <artifactId>amazon-kinesis-client</artifactId>
-            <version>2.2.9</version>
+            <version>${aws-kinesis-client.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
     </dependencies>
 
