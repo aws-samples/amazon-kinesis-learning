@@ -4,7 +4,7 @@ The master branch provides completed code for the [Process Real-Time Stock Data 
 
 The tutorial uses KCL 2.2.9 to demonstrate how to send a stream of records to Kinesis Data Streams and implement an application that consumes and processes the records in near-real time. 
 
-[learning-kinesis]:  https://docs.aws.amazon.com/streams/latest/dev/tutorial-stock-data-kplkcl.html
+[learning-kinesis]:  https://docs.aws.amazon.com/streams/latest/dev/tutorial-stock-data-kplkcl2.html
 [kinesis-developer-guide]: http://docs.aws.amazon.com/kinesis/latest/dev/introduction.html
 
 ## License Summary
