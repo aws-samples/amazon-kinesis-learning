@@ -43,7 +43,7 @@
         <dependency>
             <groupId>software.amazon.kinesis</groupId>
             <artifactId>amazon-kinesis-client</artifactId>
-            <version>2.2.9</version>
+            <version>3.0.2</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
